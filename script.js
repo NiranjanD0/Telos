@@ -207,6 +207,7 @@ function renderNotes() {
     const textarea = document.createElement('textarea');
     textarea.value = note.text;
     textarea.maxLength = 240;
+    textarea.spellcheck = false;
     textarea.addEventListener('input', () => {
       note.text = textarea.value;
       storageSet('notes', notes);
