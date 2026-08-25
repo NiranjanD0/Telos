@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Telos",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A developer-styled homepage: live clock, sticky notes, to-do list, and quick shortcuts.",
   "chrome_url_overrides": {
     "newtab": "newtab.html"

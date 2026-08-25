@@ -26,13 +26,13 @@ updateClock();
 setInterval(updateClock, 1000);
 
 const QUOTES = [
-  'code never lies, comments sometimes do',
-  'ship small, ship often',
-  'commit early, commit often',
-  'there are only two hard things in computer science',
-  'make it work, make it right, make it fast',
-  'the best code is no code at all',
-  'today\'s bug is tomorrow\'s war story'
+  'Believe you can and you\'re halfway there.',
+  'Your time is limited, so don\'t waste it living someone else\'s life.',
+  'The only way to do great work is to love what you do.',
+  'If you can dream it, you can do it.',
+  'Don\'t watch the clock; do what it does. Keep going.',
+  'Do what you can, with what you have, where you are.',
+  'The future belongs to those who believe in the beauty of their dreams.'
 ];
 document.getElementById('quote').textContent = '// ' + QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
@@ -81,8 +81,22 @@ function storageGet(keys) {
   return Promise.resolve(result);
 }
 
+/* Tracks writes this tab made itself, keyed by storage key.
+   chrome.storage.onChanged fires in EVERY context that has a listener,
+   including the tab that called .set() — not just other tabs. Without
+   this, typing in a sticky note (which calls storageSet on every
+   keystroke) would trigger the onChanged listener below, which
+   re-renders the notes board and destroys/recreates the textarea you're
+   actively typing in — killing focus and the cursor position after
+   nearly every character. This counter lets the onChanged listener
+   recognize "this change came from me, I'm already in sync" and skip
+   the redundant re-render, while still re-rendering for changes that
+   really did come from another tab. */
+const pendingLocalChanges = { todos: 0, notes: 0, links: 0 };
+
 function storageSet(key, value) {
   if (hasChromeStorage) {
+    pendingLocalChanges[key] = (pendingLocalChanges[key] || 0) + 1;
     chrome.storage.local.set({ [key]: value });
   } else {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* ignore */ }
@@ -428,7 +442,7 @@ const DEFAULT_LINKS = [
 ];
 
 const DEFAULT_NOTES = [
-  { id: uid(), text: 'pin important stuff here', color: NOTE_COLORS[0] }
+  { id: uid(), text: "Life's beautiful, Jane", color: NOTE_COLORS[0] }
 ];
 
 storageGet({ todos: [], notes: DEFAULT_NOTES, links: DEFAULT_LINKS }).then(data => {
@@ -444,18 +458,31 @@ storageGet({ todos: [], notes: DEFAULT_NOTES, links: DEFAULT_LINKS }).then(data 
 if (hasChromeStorage) {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== 'local') return;
+
     if (changes.todos) {
-      todos = changes.todos.newValue || [];
-      renderTodos();
+      if (pendingLocalChanges.todos > 0) {
+        pendingLocalChanges.todos--;
+      } else {
+        todos = changes.todos.newValue || [];
+        renderTodos();
+      }
     }
     if (changes.notes) {
-      notes = changes.notes.newValue || [];
-      backfillNoteColors();
-      renderNotes();
+      if (pendingLocalChanges.notes > 0) {
+        pendingLocalChanges.notes--;
+      } else {
+        notes = changes.notes.newValue || [];
+        backfillNoteColors();
+        renderNotes();
+      }
     }
     if (changes.links) {
-      links = changes.links.newValue || [];
-      renderLinks();
+      if (pendingLocalChanges.links > 0) {
+        pendingLocalChanges.links--;
+      } else {
+        links = changes.links.newValue || [];
+        renderLinks();
+      }
     }
   });
 }
