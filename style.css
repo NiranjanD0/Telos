@@ -167,14 +167,15 @@ html, body {
 
 /* ---------- PANELS ---------- */
 .panels {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 28px;
   align-items: start;
 }
 
 @media (max-width: 860px) {
-  .panels { grid-template-columns: 1fr; }
+  .panels { flex-direction: column; align-items: stretch; }
 }
 
 .panel {
@@ -185,6 +186,8 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 440px;
+  flex: 0 0 340px;
+  max-width: 420px;
 }
 
 .panel-head {
