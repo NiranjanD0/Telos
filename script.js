@@ -92,7 +92,7 @@ function storageGet(keys) {
    recognize "this change came from me, I'm already in sync" and skip
    the redundant re-render, while still re-rendering for changes that
    really did come from another tab. */
-const pendingLocalChanges = { todos: 0, notes: 0, links: 0 };
+const pendingLocalChanges = { todos: 0, notes: 0, links: 0, settings: 0 };
 
 function storageSet(key, value) {
   if (hasChromeStorage) {
@@ -487,3 +487,111 @@ if (hasChromeStorage) {
     }
   });
 }
+
+
+/* ---------------- SETTINGS ---------------- */
+
+const THEMES = {
+  //                  bg        panel     panel2    line      text      textDim   blue      blue2     red
+  midnight: { bg:'#0d1420', panel:'#131c2b', panel2:'#182335', line:'#263349', text:'#dbe4f3', textDim:'#7c8aa8', blue:'#4f8ff7', blue2:'#6fb4ff', red:'#c6604d' },
+  abyss:    { bg:'#0a0e17', panel:'#101626', panel2:'#141e30', line:'#1e2d44', text:'#d0ddf5', textDim:'#6a7d9e', blue:'#3d7ef5', blue2:'#5da4ff', red:'#c0584a' },
+  forest:   { bg:'#0d1a12', panel:'#111f16', panel2:'#16271c', line:'#223b2a', text:'#d5edd8', textDim:'#6a8f72', blue:'#4ecb7a', blue2:'#72e89a', red:'#c06050' },
+  plum:     { bg:'#130d1e', panel:'#1a1028', panel2:'#201433', line:'#2e1d48', text:'#e2d5f5', textDim:'#8f7aaa', blue:'#9f6cf5', blue2:'#bf9aff', red:'#d05870' },
+  ember:    { bg:'#1a0d0a', panel:'#22110d', panel2:'#2a1610', line:'#3d2016', text:'#f5e2d8', textDim:'#a07060', blue:'#e87040', blue2:'#ff9060', red:'#e05040' },
+  slate:    { bg:'#111418', panel:'#181c21', panel2:'#1e242c', line:'#28313d', text:'#d8e0ee', textDim:'#6e7d94', blue:'#5a8fc0', blue2:'#7ab0e0', red:'#c0605a' },
+  ocean:    { bg:'#091421', panel:'#0e1c2e', panel2:'#122338', line:'#1a3350', text:'#cce8f5', textDim:'#5a8aaa', blue:'#30b4e8', blue2:'#60d4ff', red:'#c05060' },
+  ash:      { bg:'#0a0a0a', panel:'#141414', panel2:'#1c1c1c', line:'#2a2a2a', text:'#e8e8e8', textDim:'#888888', blue:'#bbbbbb', blue2:'#dddddd', red:'#cc6666' },
+};
+
+const DEFAULT_SETTINGS = { theme: 'midnight', panels: { todo: true, shortcuts: true, notes: true } };
+
+function applyTheme(name) {
+  const t = THEMES[name] || THEMES.midnight;
+  const root = document.documentElement;
+  root.style.setProperty('--bg',        t.bg);
+  root.style.setProperty('--bg-panel',  t.panel);
+  root.style.setProperty('--bg-panel-2',t.panel2);
+  root.style.setProperty('--line',      t.line);
+  root.style.setProperty('--text',      t.text);
+  root.style.setProperty('--text-dim',  t.textDim);
+  root.style.setProperty('--blue',      t.blue);
+  root.style.setProperty('--blue-2',    t.blue2);
+  root.style.setProperty('--red',       t.red);
+
+  // mark active swatch
+  document.querySelectorAll('.swatch').forEach(s => {
+    s.classList.toggle('active', s.dataset.theme === name);
+  });
+}
+
+function applyPanelVisibility(panels) {
+  document.getElementById('panel-todo').style.display  = panels.todo      ? '' : 'none';
+  document.getElementById('panel-links').style.display = panels.shortcuts  ? '' : 'none';
+  document.getElementById('panel-notes').style.display = panels.notes      ? '' : 'none';
+
+  document.getElementById('toggle-todo').checked      = panels.todo;
+  document.getElementById('toggle-shortcuts').checked = panels.shortcuts;
+  document.getElementById('toggle-notes').checked     = panels.notes;
+}
+
+// --- open / close ---
+const settingsBtn     = document.getElementById('settings-btn');
+const settingsOverlay = document.getElementById('settings-overlay');
+const settingsClose   = document.getElementById('settings-close');
+
+function openSettings() {
+  settingsOverlay.classList.add('show');
+  settingsBtn.classList.add('active');
+}
+function closeSettings() {
+  settingsOverlay.classList.remove('show');
+  settingsBtn.classList.remove('active');
+}
+
+settingsBtn.addEventListener('click', () => {
+  settingsOverlay.classList.contains('show') ? closeSettings() : openSettings();
+});
+settingsClose.addEventListener('click', closeSettings);
+settingsOverlay.addEventListener('click', e => {
+  if (e.target === settingsOverlay) closeSettings();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && settingsOverlay.classList.contains('show')) closeSettings();
+});
+
+// --- panel toggles ---
+function saveSettings() {
+  const s = {
+    theme: currentTheme,
+    panels: {
+      todo:      document.getElementById('toggle-todo').checked,
+      shortcuts: document.getElementById('toggle-shortcuts').checked,
+      notes:     document.getElementById('toggle-notes').checked,
+    }
+  };
+  storageSet('settings', s);
+  applyPanelVisibility(s.panels);
+}
+
+['toggle-todo', 'toggle-shortcuts', 'toggle-notes'].forEach(id => {
+  document.getElementById(id).addEventListener('change', saveSettings);
+});
+
+// --- theme swatches ---
+let currentTheme = 'midnight';
+
+document.querySelectorAll('.swatch').forEach(swatch => {
+  swatch.addEventListener('click', () => {
+    currentTheme = swatch.dataset.theme;
+    applyTheme(currentTheme);
+    saveSettings();
+  });
+});
+
+// --- load settings on init ---
+storageGet({ settings: DEFAULT_SETTINGS }).then(data => {
+  const s = data.settings || DEFAULT_SETTINGS;
+  currentTheme = s.theme || 'midnight';
+  applyTheme(currentTheme);
+  applyPanelVisibility(s.panels || DEFAULT_SETTINGS.panels);
+});
