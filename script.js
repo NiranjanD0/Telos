@@ -500,13 +500,13 @@ const THEMES = {
   ember:    { bg:'#1a0d0a', panel:'#22110d', panel2:'#2a1610', line:'#3d2016', text:'#f5e2d8', textDim:'#a07060', blue:'#e87040', blue2:'#ff9060', red:'#e05040' },
   slate:    { bg:'#111418', panel:'#181c21', panel2:'#1e242c', line:'#28313d', text:'#d8e0ee', textDim:'#6e7d94', blue:'#5a8fc0', blue2:'#7ab0e0', red:'#c0605a' },
   ocean:    { bg:'#091421', panel:'#0e1c2e', panel2:'#122338', line:'#1a3350', text:'#cce8f5', textDim:'#5a8aaa', blue:'#30b4e8', blue2:'#60d4ff', red:'#c05060' },
-  ash:      { bg:'#0a0a0a', panel:'#141414', panel2:'#1c1c1c', line:'#2a2a2a', text:'#e8e8e8', textDim:'#888888', blue:'#bbbbbb', blue2:'#dddddd', red:'#cc6666' },
+  ash:      { bg:'#000000', panel:'#141414', panel2:'#1c1c1c', line:'#2a2a2a', text:'#e8e8e8', textDim:'#888888', blue:'#bbbbbb', blue2:'#dddddd', red:'#cc6666' },
 };
 
-const DEFAULT_SETTINGS = { theme: 'midnight', panels: { todo: true, shortcuts: true, notes: true } };
+const DEFAULT_SETTINGS = { theme: 'ash', panels: { todo: true, shortcuts: true, notes: true } };
 
 function applyTheme(name) {
-  const t = THEMES[name] || THEMES.midnight;
+  const t = THEMES[name] || THEMES.ash;
   const root = document.documentElement;
   root.style.setProperty('--bg',        t.bg);
   root.style.setProperty('--bg-panel',  t.panel);
@@ -578,7 +578,7 @@ function saveSettings() {
 });
 
 // --- theme swatches ---
-let currentTheme = 'midnight';
+let currentTheme = 'ash';
 
 document.querySelectorAll('.swatch').forEach(swatch => {
   swatch.addEventListener('click', () => {
@@ -591,7 +591,7 @@ document.querySelectorAll('.swatch').forEach(swatch => {
 // --- load settings on init ---
 storageGet({ settings: DEFAULT_SETTINGS }).then(data => {
   const s = data.settings || DEFAULT_SETTINGS;
-  currentTheme = s.theme || 'midnight';
+  currentTheme = s.theme || 'ash';
   applyTheme(currentTheme);
   applyPanelVisibility(s.panels || DEFAULT_SETTINGS.panels);
 });
