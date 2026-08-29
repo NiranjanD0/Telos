@@ -13,7 +13,7 @@
   <div class="grid-bg"></div>
 
   <!-- TOP-RIGHT ACTIONS -->
-  <div class="top-actions">
+  <div class="fixed top-[18px] right-[20px] z-40 flex items-center gap-2">
     <!-- SETTINGS BUTTON -->
     <button class="top-btn" id="settings-btn" title="Settings" aria-label="Open settings">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -34,22 +34,22 @@
     </a>
   </div>
 
-  <main class="wrap">
+  <main class="relative z-10 max-w-[1400px] mx-auto px-12 pt-12 pb-8 min-h-screen flex flex-col">
 
     <!-- HERO: clock -->
-    <header class="hero">
-      <p class="greeting" id="greeting">// good morning, developer</p>
-      <div class="clock" id="clock">
-        <span id="clock-time">00:00<span class="cursor">:</span>00</span>
+    <header class="text-center mb-14">
+      <p class="font-mono text-blue-2 text-[18px] tracking-[0.02em] m-0 mb-3.5" id="greeting">// good morning, developer</p>
+      <div class="font-mono font-bold text-[clamp(56px,11vw,108px)] leading-none text-text tracking-[0.01em] drop-shadow-[0_0_28px_rgba(79,143,247,0.22)] mb-2.5" id="clock">
+        <span id="clock-time">00:00<span class="text-blue animate-blink">:</span>00</span>
       </div>
-      <p class="gitline" id="gitline">loading…</p>
+      <p class="font-mono text-[17px] text-text-dim mt-3.5 mb-0" id="gitline">loading…</p>
     </header>
 
     <!-- SEARCH -->
-    <form class="searchbar" id="searchbar" autocomplete="off">
-      <span class="chevron">&gt;</span>
-      <input type="text" id="search-input" placeholder="search the web <3" spellcheck="false" />
-      <button type="submit" class="search-go" title="search">
+    <form class="flex items-center gap-2.5 max-w-[560px] mx-auto mb-10 bg-panel border border-line rounded-lg px-4 py-3 transition-colors duration-150 focus-within:border-blue-2" id="searchbar" autocomplete="off">
+      <span class="text-blue-2 select-none font-mono font-bold">&gt;</span>
+      <input type="text" id="search-input" class="flex-1 bg-transparent border-none outline-none text-text font-mono text-[16px] placeholder:text-text-dim focus-visible:outline-none" placeholder="search the web <3" spellcheck="false" />
+      <button type="submit" class="flex items-center justify-center bg-transparent border-none text-text-dim cursor-pointer p-0.5 transition-colors duration-150 hover:text-blue-2" title="search">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6" />
           <path d="M20 20L16.5 16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
@@ -58,42 +58,42 @@
     </form>
 
     <!-- PANELS -->
-    <section class="panels">
+    <section class="flex justify-center flex-wrap gap-6 mt-4 flex-1 items-stretch">
 
       <!-- TODO -->
-      <div class="panel" id="panel-todo">
-        <div class="panel-head">
-          <span class="prompt">$ todo --list</span>
-          <span class="count" id="todo-count">0 open</span>
+      <div class="w-[320px] bg-panel border border-line rounded-xl p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden transition-colors duration-200 hover:border-blue-2" id="panel-todo">
+        <div class="flex justify-between items-center pb-2.5 border-b border-dashed border-line">
+          <span class="font-mono text-blue font-bold text-[14px]">$ todo --list</span>
+          <span class="font-mono text-[12px] text-text-dim" id="todo-count">0 open</span>
         </div>
-        <form class="todo-form" id="todo-form" autocomplete="off">
-          <span class="chevron">&gt;</span>
-          <input type="text" id="todo-input" placeholder="add a task, hit enter" maxlength="140" spellcheck="false" />
+        <form class="flex items-center gap-2 bg-panel-2 rounded-md px-3 py-2 border border-transparent focus-within:border-line focus-within:shadow-[inset_0_1px_3px_rgba(0,0,0,0.2)] transition-all" id="todo-form" autocomplete="off">
+          <span class="text-blue select-none font-bold font-mono">&gt;</span>
+          <input type="text" id="todo-input" class="flex-1 bg-transparent border-none outline-none text-text font-sans text-[14px] placeholder:text-text-dim focus-visible:outline-none" placeholder="add a task, hit enter" maxlength="140" spellcheck="false" />
         </form>
-        <ul class="todo-list" id="todo-list"></ul>
+        <ul class="list-none m-0 p-0 flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1" id="todo-list"></ul>
       </div>
 
       <!-- SHORTCUTS -->
-      <div class="panel" id="panel-links">
-        <div class="panel-head">
-          <span class="prompt">~/shortcuts</span>
+      <div class="w-[320px] bg-panel border border-line rounded-xl p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden transition-colors duration-200 hover:border-blue-2" id="panel-links">
+        <div class="flex justify-between items-center pb-2.5 border-b border-dashed border-line">
+          <span class="font-mono text-blue font-bold text-[14px]">~/shortcuts</span>
           <button class="add-btn" id="link-add" title="add shortcut">+ new</button>
         </div>
-        <div class="links-grid" id="links-grid"></div>
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-2.5" id="links-grid"></div>
       </div>
 
       <!-- STICKY NOTES -->
-      <div class="panel" id="panel-notes">
-        <div class="panel-head">
-          <span class="prompt">// sticky-notes</span>
+      <div class="w-[320px] bg-panel border border-line rounded-xl p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden transition-colors duration-200 hover:border-blue-2" id="panel-notes">
+        <div class="flex justify-between items-center pb-2.5 border-b border-dashed border-line">
+          <span class="font-mono text-blue font-bold text-[14px]">// sticky-notes</span>
           <button class="add-btn" id="note-add" title="add note">+ new</button>
         </div>
-        <div class="notes-board" id="notes-board"></div>
+        <div class="flex-1 grid grid-cols-2 grid-rows-2 gap-[14px] p-1 pt-2 overflow-hidden" id="notes-board"></div>
       </div>
 
     </section>
 
-    <footer class="foot">
+    <footer class="mt-16 text-center font-mono text-[12px] text-text-dim opacity-50 uppercase tracking-[0.2em] pointer-events-none">
       <span id="quote">// keep building</span>
     </footer>
 
@@ -102,58 +102,58 @@
   <!-- SHORTCUT EDIT/ADD MODAL -->
   <div class="modal-overlay" id="link-modal-overlay">
     <div class="modal" id="link-modal">
-      <p class="modal-title" id="link-modal-title">// new shortcut</p>
-      <label class="modal-label" for="link-name-input">shortcut name</label>
-      <input type="text" id="link-name-input" class="modal-input" placeholder="e.g. Figma" maxlength="40"
+      <p class="font-mono text-blue font-bold text-[16px] mb-5 m-0" id="link-modal-title">// new shortcut</p>
+      <label class="block font-mono text-[11px] text-text-dim uppercase tracking-[0.1em] mb-1.5" for="link-name-input">shortcut name</label>
+      <input type="text" id="link-name-input" class="w-full bg-panel-2 border border-line text-text font-sans text-[14px] p-2.5 rounded-md mb-4 outline-none transition-colors focus-visible:border-blue-2" placeholder="e.g. Figma" maxlength="40"
         spellcheck="false" />
-      <label class="modal-label" for="link-url-input">shortcut link</label>
-      <input type="text" id="link-url-input" class="modal-input" placeholder="e.g. figma.com" maxlength="200"
+      <label class="block font-mono text-[11px] text-text-dim uppercase tracking-[0.1em] mb-1.5" for="link-url-input">shortcut link</label>
+      <input type="text" id="link-url-input" class="w-full bg-panel-2 border border-line text-text font-sans text-[14px] p-2.5 rounded-md mb-6 outline-none transition-colors focus-visible:border-blue-2" placeholder="e.g. figma.com" maxlength="200"
         spellcheck="false" />
-      <div class="modal-actions">
-        <button class="modal-btn cancel" id="link-modal-cancel">cancel</button>
-        <button class="modal-btn save" id="link-modal-save">save</button>
+      <div class="flex justify-end gap-2.5 mt-2">
+        <button class="bg-transparent border border-line text-text-dim px-4 py-2 rounded-md font-sans text-[14px] cursor-pointer transition-colors hover:text-text hover:bg-panel-2" id="link-modal-cancel">cancel</button>
+        <button class="bg-blue text-panel font-bold border-none px-4 py-2 rounded-md font-sans text-[14px] cursor-pointer transition-all hover:bg-blue-2" id="link-modal-save">save</button>
       </div>
     </div>
   </div>
 
   <!-- SETTINGS MODAL -->
   <div class="modal-overlay" id="settings-overlay">
-    <div class="modal settings-modal" id="settings-modal">
-      <div class="settings-header">
-        <p class="modal-title">// settings</p>
-        <button class="settings-close" id="settings-close" aria-label="Close settings">✕</button>
+    <div class="modal" id="settings-modal">
+      <div class="flex justify-between items-center mb-6">
+        <p class="font-mono text-blue font-bold text-[16px] m-0">// settings</p>
+        <button class="bg-transparent border-none text-text-dim text-[16px] cursor-pointer px-1.5 py-0.5 rounded leading-none transition-colors hover:text-text" id="settings-close" aria-label="Close settings">✕</button>
       </div>
 
-      <p class="settings-section-label">general</p>
-      <div style="margin-bottom: 22px;">
-        <input type="text" id="tab-name-input" class="settings-input" placeholder="Tab Name" autocomplete="off" spellcheck="false" />
+      <p class="font-mono text-[11px] uppercase tracking-[0.1em] text-text-dim m-0 mb-2.5">general</p>
+      <div class="mb-[22px]">
+        <input type="text" id="tab-name-input" class="w-full bg-panel-2 border border-line text-text font-sans text-[14px] px-3 py-2 rounded-md outline-none transition-colors focus-visible:border-blue-2" placeholder="Tab Name" autocomplete="off" spellcheck="false" />
       </div>
     
-      <p class="settings-section-label">background theme</p>
-      <div class="theme-swatches" id="theme-swatches">
+      <p class="font-mono text-[11px] uppercase tracking-[0.1em] text-text-dim m-0 mb-2.5">background theme</p>
+      <div class="theme-swatches grid grid-cols-8 gap-2 mb-[22px]" id="theme-swatches">
         <!-- populated dynamically by JS -->
       </div>
 
-      <p class="settings-section-label">panels</p>
-      <div class="settings-toggles">
-        <label class="toggle-row" for="toggle-todo">
-          <span class="toggle-name">$ todo --list</span>
-          <span class="toggle-switch">
-            <input type="checkbox" id="toggle-todo" checked />
+      <p class="font-mono text-[11px] uppercase tracking-[0.1em] text-text-dim m-0 mb-2.5">panels</p>
+      <div class="flex flex-col gap-1 mb-[22px]">
+        <label class="flex justify-between items-center py-1.5 cursor-pointer group" for="toggle-todo">
+          <span class="font-mono text-[14px] text-text transition-colors group-hover:text-blue-2">$ todo --list</span>
+          <span class="toggle-switch relative inline-block w-[38px] h-[21px]">
+            <input type="checkbox" id="toggle-todo" class="sr-only" checked />
             <span class="toggle-track"><span class="toggle-thumb"></span></span>
           </span>
         </label>
-        <label class="toggle-row" for="toggle-shortcuts">
-          <span class="toggle-name">~/shortcuts</span>
-          <span class="toggle-switch">
-            <input type="checkbox" id="toggle-shortcuts" checked />
+        <label class="flex justify-between items-center py-1.5 cursor-pointer group" for="toggle-shortcuts">
+          <span class="font-mono text-[14px] text-text transition-colors group-hover:text-blue-2">~/shortcuts</span>
+          <span class="toggle-switch relative inline-block w-[38px] h-[21px]">
+            <input type="checkbox" id="toggle-shortcuts" class="sr-only" checked />
             <span class="toggle-track"><span class="toggle-thumb"></span></span>
           </span>
         </label>
-        <label class="toggle-row" for="toggle-notes">
-          <span class="toggle-name">// sticky-notes</span>
-          <span class="toggle-switch">
-            <input type="checkbox" id="toggle-notes" checked />
+        <label class="flex justify-between items-center py-1.5 cursor-pointer group" for="toggle-notes">
+          <span class="font-mono text-[14px] text-text transition-colors group-hover:text-blue-2">// sticky-notes</span>
+          <span class="toggle-switch relative inline-block w-[38px] h-[21px]">
+            <input type="checkbox" id="toggle-notes" class="sr-only" checked />
             <span class="toggle-track"><span class="toggle-thumb"></span></span>
           </span>
         </label>

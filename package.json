@@ -1,0 +1,25 @@
+{
+  "name": "telos",
+  "version": "3.0.0",
+  "description": "A sleek, developer-focused Chrome New Tab extension featuring a clean terminal aesthetic and customizable features.",
+  "main": "script.js",
+  "scripts": {
+    "build": "tailwindcss -i ./src/input.css -o ./style.css && mkdir -p out && zip -r out/telos-v$npm_package_version.zip manifest.json newtab.html script.js style.css icons/",
+    "watch": "tailwindcss -i ./src/input.css -o ./style.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NiranjanD0/Telos.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/NiranjanD0/Telos/issues"
+  },
+  "homepage": "https://github.com/NiranjanD0/Telos#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^3.4.19"
+  }
+}
