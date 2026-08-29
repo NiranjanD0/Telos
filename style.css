@@ -662,6 +662,22 @@ a:focus-visible {
   margin: 0 0 10px;
 }
 
+.settings-input {
+  width: 100%;
+  background: var(--bg-panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color .2s;
+}
+.settings-input:focus-visible {
+  border-color: var(--blue-2);
+}
+
 /* --- Toggles --- */
 .settings-toggles {
   display: flex;
@@ -736,7 +752,7 @@ a:focus-visible {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 22px;
 }
 
 .swatch {

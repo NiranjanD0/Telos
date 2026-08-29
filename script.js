@@ -503,7 +503,7 @@ const THEMES = {
   ash:      { bg:'#000000', panel:'#141414', panel2:'#1c1c1c', line:'#2a2a2a', text:'#e8e8e8', textDim:'#888888', blue:'#bbbbbb', blue2:'#dddddd', red:'#cc6666' },
 };
 
-const DEFAULT_SETTINGS = { theme: 'ash', panels: { todo: true, shortcuts: true, notes: true } };
+const DEFAULT_SETTINGS = { theme: 'ash', tabName: 'Telos', panels: { todo: true, shortcuts: true, notes: true } };
 
 function applyTheme(name) {
   const t = THEMES[name] || THEMES.ash;
@@ -532,6 +532,10 @@ function applyPanelVisibility(panels) {
   document.getElementById('toggle-todo').checked      = panels.todo;
   document.getElementById('toggle-shortcuts').checked = panels.shortcuts;
   document.getElementById('toggle-notes').checked     = panels.notes;
+}
+
+function applyTabName(name) {
+  document.title = name || 'Telos';
 }
 
 // --- open / close ---
@@ -563,6 +567,7 @@ document.addEventListener('keydown', e => {
 function saveSettings() {
   const s = {
     theme: currentTheme,
+    tabName: document.getElementById('tab-name-input').value.trim() || 'Telos',
     panels: {
       todo:      document.getElementById('toggle-todo').checked,
       shortcuts: document.getElementById('toggle-shortcuts').checked,
@@ -571,21 +576,33 @@ function saveSettings() {
   };
   storageSet('settings', s);
   applyPanelVisibility(s.panels);
+  applyTabName(s.tabName);
 }
 
 ['toggle-todo', 'toggle-shortcuts', 'toggle-notes'].forEach(id => {
   document.getElementById(id).addEventListener('change', saveSettings);
 });
 
+document.getElementById('tab-name-input').addEventListener('input', saveSettings);
+
 // --- theme swatches ---
 let currentTheme = 'ash';
 
-document.querySelectorAll('.swatch').forEach(swatch => {
-  swatch.addEventListener('click', () => {
-    currentTheme = swatch.dataset.theme;
+const swatchesContainer = document.getElementById('theme-swatches');
+Object.keys(THEMES).forEach(themeName => {
+  const btn = document.createElement('button');
+  btn.className = 'swatch';
+  btn.dataset.theme = themeName;
+  btn.title = themeName.charAt(0).toUpperCase() + themeName.slice(1);
+  btn.style.background = THEMES[themeName].bg;
+  
+  btn.addEventListener('click', () => {
+    currentTheme = themeName;
     applyTheme(currentTheme);
     saveSettings();
   });
+  
+  swatchesContainer.appendChild(btn);
 });
 
 // --- load settings on init ---
@@ -593,5 +610,10 @@ storageGet({ settings: DEFAULT_SETTINGS }).then(data => {
   const s = data.settings || DEFAULT_SETTINGS;
   currentTheme = s.theme || 'ash';
   applyTheme(currentTheme);
+  
+  const tabName = s.tabName || 'Telos';
+  document.getElementById('tab-name-input').value = tabName;
+  applyTabName(tabName);
+  
   applyPanelVisibility(s.panels || DEFAULT_SETTINGS.panels);
 });

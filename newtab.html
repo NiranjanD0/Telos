@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>New Tab</title>
+  <title>Telos</title>
+  <link rel="icon" type="image/svg+xml" href="icons/favicon-bw.svg" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -123,6 +124,16 @@
         <button class="settings-close" id="settings-close" aria-label="Close settings">✕</button>
       </div>
 
+      <p class="settings-section-label">general</p>
+      <div style="margin-bottom: 22px;">
+        <input type="text" id="tab-name-input" class="settings-input" placeholder="Tab Name" autocomplete="off" spellcheck="false" />
+      </div>
+    
+      <p class="settings-section-label">background theme</p>
+      <div class="theme-swatches" id="theme-swatches">
+        <!-- populated dynamically by JS -->
+      </div>
+
       <p class="settings-section-label">panels</p>
       <div class="settings-toggles">
         <label class="toggle-row" for="toggle-todo">
@@ -148,17 +159,6 @@
         </label>
       </div>
 
-      <p class="settings-section-label">background theme</p>
-      <div class="theme-swatches" id="theme-swatches">
-        <button class="swatch" data-theme="ash"      title="Ash"          style="background:#0a0a0a"></button>
-        <button class="swatch" data-theme="midnight" title="Midnight Blue" style="background:#0d1420"></button>
-        <button class="swatch" data-theme="abyss"    title="Deep Abyss"   style="background:#0a0e17"></button>
-        <button class="swatch" data-theme="forest"   title="Dark Forest"  style="background:#0d1a12"></button>
-        <button class="swatch" data-theme="plum"     title="Plum Dark"    style="background:#130d1e"></button>
-        <button class="swatch" data-theme="ember"    title="Ember"        style="background:#1a0d0a"></button>
-        <button class="swatch" data-theme="slate"    title="Slate"        style="background:#111418"></button>
-        <button class="swatch" data-theme="ocean"    title="Ocean"        style="background:#091421"></button>
-      </div>
     </div>
   </div>
 
