@@ -1,6 +1,6 @@
 {
   "name": "telos",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A sleek, developer-focused Chrome New Tab extension featuring a clean terminal aesthetic and customizable features.",
   "main": "script.js",
   "scripts": {
