@@ -121,6 +121,12 @@
     @apply opacity-0 bg-transparent border-none text-red cursor-pointer font-mono text-[14px] transition-opacity duration-150;
   }
   .todo-item:hover .del { @apply opacity-100; }
+  .empty-hint {
+    @apply font-mono text-[14px] text-text-dim py-2.5 px-0.5 list-none;
+  }
+  .cursor {
+    @apply text-blue animate-blink;
+  }
 
   /* Shortcuts */
   .link-tile {

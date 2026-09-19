@@ -8,7 +8,7 @@ function updateClock() {
   const m = pad(now.getMinutes());
   const s = pad(now.getSeconds());
   document.getElementById('clock-time').innerHTML =
-    `${h}<span class="cursor">:</span>${m}<span class="cursor">:</span>${s}`;
+    `${h}<span class="text-blue animate-blink">:</span>${m}<span class="text-blue animate-blink">:</span>${s}`;
 
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -36,19 +36,6 @@ const QUOTES = [
 ];
 document.getElementById('quote').textContent = '// ' + QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
-
-/* ---------------- SEARCH BAR ---------------- */
-
-document.getElementById('searchbar').addEventListener('submit', e => {
-  e.preventDefault();
-  const input = document.getElementById('search-input');
-  const query = input.value.trim();
-  if (!query) return;
-  // if it looks like a URL, go straight there; otherwise search Google
-  const isUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+.*$/i.test(query) && !query.includes(' ');
-  const dest = isUrl ? normalizeUrl(query) : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-  window.location.href = dest;
-});
 
 
 /* ---------------- STORAGE HELPERS ----------------
@@ -483,6 +470,20 @@ if (hasChromeStorage) {
       } else {
         links = changes.links.newValue || [];
         renderLinks();
+      }
+    }
+    if (changes.settings) {
+      if (pendingLocalChanges.settings > 0) {
+        pendingLocalChanges.settings--;
+      } else {
+        const s = changes.settings.newValue || DEFAULT_SETTINGS;
+        currentTheme = s.theme || 'ash';
+        applyTheme(currentTheme);
+        const tabName = s.tabName || 'Telos';
+        const tabInput = document.getElementById('tab-name-input');
+        if (tabInput) tabInput.value = tabName;
+        applyTabName(tabName);
+        applyPanelVisibility(s.panels || DEFAULT_SETTINGS.panels);
       }
     }
   });

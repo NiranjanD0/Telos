@@ -871,6 +871,22 @@ html, body{
   opacity: 1;
 }
 
+.empty-hint{
+  list-style-type: none;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  padding-left: 0.125rem;
+  padding-right: 0.125rem;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.cursor{
+  color: var(--blue);
+  animation: blink 1s steps(1) infinite;
+}
+
 /* Shortcuts */
 
 .link-tile{
