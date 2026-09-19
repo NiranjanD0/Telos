@@ -426,13 +426,13 @@ linkModalSave.addEventListener('click', () => {
 /* ---------------- INIT + LIVE CROSS-TAB SYNC ---------------- */
 
 const DEFAULT_LINKS = [
-  { id: uid(), label: 'GitHub', url: 'https://github.com' },
   { id: uid(), label: 'ChatGPT', url: 'https://chatgpt.com' },
+  { id: uid(), label: 'GitHub', url: 'https://github.com' },
   { id: uid(), label: 'Notion', url: 'https://notion.so' }
 ];
 
 const DEFAULT_NOTES = [
-  { id: uid(), text: "Life's beautiful, Jane", color: NOTE_COLORS[0] }
+  { id: uid(), text: "Life's Beautiful, Jane", color: NOTE_COLORS[0] }
 ];
 
 storageGet({ todos: [], notes: DEFAULT_NOTES, links: DEFAULT_LINKS }).then(data => {
