@@ -269,7 +269,9 @@ function renderLinks() {
       e.dataTransfer.dropEffect = 'move';
       if (!draggedTile || draggedTile === a) return;
       const rect = a.getBoundingClientRect();
-      const before = e.clientX - rect.left < rect.width / 2;
+      const midY = rect.top + rect.height / 2;
+      const midX = rect.left + rect.width / 2;
+      const before = e.clientY < midY - 6 ? true : (e.clientY > midY + 6 ? false : e.clientX < midX);
       grid.insertBefore(draggedTile, before ? a : a.nextSibling);
     });
 
@@ -519,6 +521,12 @@ function applyTheme(name) {
   root.style.setProperty('--blue-2',    t.blue2);
   root.style.setProperty('--red',       t.red);
 
+  // update active theme badge
+  const themeBadge = document.getElementById('current-theme-name');
+  if (themeBadge) {
+    themeBadge.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  }
+
   // mark active swatch
   document.querySelectorAll('.swatch').forEach(s => {
     s.classList.toggle('active', s.dataset.theme === name);
@@ -591,18 +599,29 @@ let currentTheme = 'ash';
 
 const swatchesContainer = document.getElementById('theme-swatches');
 Object.keys(THEMES).forEach(themeName => {
+  const t = THEMES[themeName];
   const btn = document.createElement('button');
   btn.className = 'swatch';
+  btn.type = 'button';
   btn.dataset.theme = themeName;
   btn.title = themeName.charAt(0).toUpperCase() + themeName.slice(1);
-  btn.style.background = THEMES[themeName].bg;
-  
+
+  const preview = document.createElement('span');
+  preview.className = 'swatch-preview';
+  preview.style.background = `linear-gradient(135deg, ${t.bg} 0%, ${t.bg} 50%, ${t.blue} 50%, ${t.blue} 100%)`;
+
+  const label = document.createElement('span');
+  label.className = 'swatch-label';
+  label.textContent = themeName.charAt(0).toUpperCase() + themeName.slice(1);
+
+  btn.append(preview, label);
+
   btn.addEventListener('click', () => {
     currentTheme = themeName;
     applyTheme(currentTheme);
     saveSettings();
   });
-  
+
   swatchesContainer.appendChild(btn);
 });
 
