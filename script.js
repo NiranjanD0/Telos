@@ -8,7 +8,7 @@ function updateClock() {
   const m = pad(now.getMinutes());
   const s = pad(now.getSeconds());
   document.getElementById('clock-time').innerHTML =
-    `${h}<span class="cursor">:</span>${m}<span class="cursor">:</span>${s}`;
+    `${h}<span class="text-blue animate-blink">:</span>${m}<span class="text-blue animate-blink">:</span>${s}`;
 
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -36,19 +36,6 @@ const QUOTES = [
 ];
 document.getElementById('quote').textContent = '// ' + QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
-
-/* ---------------- SEARCH BAR ---------------- */
-
-document.getElementById('searchbar').addEventListener('submit', e => {
-  e.preventDefault();
-  const input = document.getElementById('search-input');
-  const query = input.value.trim();
-  if (!query) return;
-  // if it looks like a URL, go straight there; otherwise search Google
-  const isUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+.*$/i.test(query) && !query.includes(' ');
-  const dest = isUrl ? normalizeUrl(query) : `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-  window.location.href = dest;
-});
 
 
 /* ---------------- STORAGE HELPERS ----------------
@@ -92,7 +79,7 @@ function storageGet(keys) {
    recognize "this change came from me, I'm already in sync" and skip
    the redundant re-render, while still re-rendering for changes that
    really did come from another tab. */
-const pendingLocalChanges = { todos: 0, notes: 0, links: 0 };
+const pendingLocalChanges = { todos: 0, notes: 0, links: 0, settings: 0 };
 
 function storageSet(key, value) {
   if (hasChromeStorage) {
@@ -282,7 +269,9 @@ function renderLinks() {
       e.dataTransfer.dropEffect = 'move';
       if (!draggedTile || draggedTile === a) return;
       const rect = a.getBoundingClientRect();
-      const before = e.clientX - rect.left < rect.width / 2;
+      const midY = rect.top + rect.height / 2;
+      const midX = rect.left + rect.width / 2;
+      const before = e.clientY < midY - 6 ? true : (e.clientY > midY + 6 ? false : e.clientX < midX);
       grid.insertBefore(draggedTile, before ? a : a.nextSibling);
     });
 
@@ -485,5 +474,166 @@ if (hasChromeStorage) {
         renderLinks();
       }
     }
+    if (changes.settings) {
+      if (pendingLocalChanges.settings > 0) {
+        pendingLocalChanges.settings--;
+      } else {
+        const s = changes.settings.newValue || DEFAULT_SETTINGS;
+        currentTheme = s.theme || 'ash';
+        applyTheme(currentTheme);
+        const tabName = s.tabName || 'Telos';
+        const tabInput = document.getElementById('tab-name-input');
+        if (tabInput) tabInput.value = tabName;
+        applyTabName(tabName);
+        applyPanelVisibility(s.panels || DEFAULT_SETTINGS.panels);
+      }
+    }
   });
 }
+
+
+/* ---------------- SETTINGS ---------------- */
+
+const THEMES = {
+  //                  bg        panel     panel2    line      text      textDim   blue      blue2     red
+  midnight: { bg:'#0d1420', panel:'#131c2b', panel2:'#182335', line:'#263349', text:'#dbe4f3', textDim:'#7c8aa8', blue:'#4f8ff7', blue2:'#6fb4ff', red:'#c6604d' },
+  abyss:    { bg:'#0a0e17', panel:'#101626', panel2:'#141e30', line:'#1e2d44', text:'#d0ddf5', textDim:'#6a7d9e', blue:'#3d7ef5', blue2:'#5da4ff', red:'#c0584a' },
+  forest:   { bg:'#0d1a12', panel:'#111f16', panel2:'#16271c', line:'#223b2a', text:'#d5edd8', textDim:'#6a8f72', blue:'#4ecb7a', blue2:'#72e89a', red:'#c06050' },
+  plum:     { bg:'#130d1e', panel:'#1a1028', panel2:'#201433', line:'#2e1d48', text:'#e2d5f5', textDim:'#8f7aaa', blue:'#9f6cf5', blue2:'#bf9aff', red:'#d05870' },
+  ember:    { bg:'#1a0d0a', panel:'#22110d', panel2:'#2a1610', line:'#3d2016', text:'#f5e2d8', textDim:'#a07060', blue:'#e87040', blue2:'#ff9060', red:'#e05040' },
+  slate:    { bg:'#111418', panel:'#181c21', panel2:'#1e242c', line:'#28313d', text:'#d8e0ee', textDim:'#6e7d94', blue:'#5a8fc0', blue2:'#7ab0e0', red:'#c0605a' },
+  ocean:    { bg:'#091421', panel:'#0e1c2e', panel2:'#122338', line:'#1a3350', text:'#cce8f5', textDim:'#5a8aaa', blue:'#30b4e8', blue2:'#60d4ff', red:'#c05060' },
+  ash:      { bg:'#000000', panel:'#141414', panel2:'#1c1c1c', line:'#2a2a2a', text:'#e8e8e8', textDim:'#888888', blue:'#bbbbbb', blue2:'#dddddd', red:'#cc6666' },
+};
+
+const DEFAULT_SETTINGS = { theme: 'ash', tabName: 'Telos', panels: { todo: true, shortcuts: true, notes: true } };
+
+function applyTheme(name) {
+  const t = THEMES[name] || THEMES.ash;
+  const root = document.documentElement;
+  root.style.setProperty('--bg',        t.bg);
+  root.style.setProperty('--bg-panel',  t.panel);
+  root.style.setProperty('--bg-panel-2',t.panel2);
+  root.style.setProperty('--line',      t.line);
+  root.style.setProperty('--text',      t.text);
+  root.style.setProperty('--text-dim',  t.textDim);
+  root.style.setProperty('--blue',      t.blue);
+  root.style.setProperty('--blue-2',    t.blue2);
+  root.style.setProperty('--red',       t.red);
+
+  // update active theme badge
+  const themeBadge = document.getElementById('current-theme-name');
+  if (themeBadge) {
+    themeBadge.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  }
+
+  // mark active swatch
+  document.querySelectorAll('.swatch').forEach(s => {
+    s.classList.toggle('active', s.dataset.theme === name);
+  });
+}
+
+function applyPanelVisibility(panels) {
+  document.getElementById('panel-todo').style.display  = panels.todo      ? '' : 'none';
+  document.getElementById('panel-links').style.display = panels.shortcuts  ? '' : 'none';
+  document.getElementById('panel-notes').style.display = panels.notes      ? '' : 'none';
+
+  document.getElementById('toggle-todo').checked      = panels.todo;
+  document.getElementById('toggle-shortcuts').checked = panels.shortcuts;
+  document.getElementById('toggle-notes').checked     = panels.notes;
+}
+
+function applyTabName(name) {
+  document.title = name || 'Telos';
+}
+
+// --- open / close ---
+const settingsBtn     = document.getElementById('settings-btn');
+const settingsOverlay = document.getElementById('settings-overlay');
+const settingsClose   = document.getElementById('settings-close');
+
+function openSettings() {
+  settingsOverlay.classList.add('show');
+  settingsBtn.classList.add('active');
+}
+function closeSettings() {
+  settingsOverlay.classList.remove('show');
+  settingsBtn.classList.remove('active');
+}
+
+settingsBtn.addEventListener('click', () => {
+  settingsOverlay.classList.contains('show') ? closeSettings() : openSettings();
+});
+settingsClose.addEventListener('click', closeSettings);
+settingsOverlay.addEventListener('click', e => {
+  if (e.target === settingsOverlay) closeSettings();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && settingsOverlay.classList.contains('show')) closeSettings();
+});
+
+// --- panel toggles ---
+function saveSettings() {
+  const s = {
+    theme: currentTheme,
+    tabName: document.getElementById('tab-name-input').value.trim() || 'Telos',
+    panels: {
+      todo:      document.getElementById('toggle-todo').checked,
+      shortcuts: document.getElementById('toggle-shortcuts').checked,
+      notes:     document.getElementById('toggle-notes').checked,
+    }
+  };
+  storageSet('settings', s);
+  applyPanelVisibility(s.panels);
+  applyTabName(s.tabName);
+}
+
+['toggle-todo', 'toggle-shortcuts', 'toggle-notes'].forEach(id => {
+  document.getElementById(id).addEventListener('change', saveSettings);
+});
+
+document.getElementById('tab-name-input').addEventListener('input', saveSettings);
+
+// --- theme swatches ---
+let currentTheme = 'ash';
+
+const swatchesContainer = document.getElementById('theme-swatches');
+Object.keys(THEMES).forEach(themeName => {
+  const t = THEMES[themeName];
+  const btn = document.createElement('button');
+  btn.className = 'swatch';
+  btn.type = 'button';
+  btn.dataset.theme = themeName;
+  btn.title = themeName.charAt(0).toUpperCase() + themeName.slice(1);
+
+  const preview = document.createElement('span');
+  preview.className = 'swatch-preview';
+  preview.style.background = `linear-gradient(135deg, ${t.bg} 0%, ${t.bg} 50%, ${t.blue} 50%, ${t.blue} 100%)`;
+
+  const label = document.createElement('span');
+  label.className = 'swatch-label';
+  label.textContent = themeName.charAt(0).toUpperCase() + themeName.slice(1);
+
+  btn.append(preview, label);
+
+  btn.addEventListener('click', () => {
+    currentTheme = themeName;
+    applyTheme(currentTheme);
+    saveSettings();
+  });
+
+  swatchesContainer.appendChild(btn);
+});
+
+// --- load settings on init ---
+storageGet({ settings: DEFAULT_SETTINGS }).then(data => {
+  const s = data.settings || DEFAULT_SETTINGS;
+  currentTheme = s.theme || 'ash';
+  applyTheme(currentTheme);
+  
+  const tabName = s.tabName || 'Telos';
+  document.getElementById('tab-name-input').value = tabName;
+  applyTabName(tabName);
+  
+  applyPanelVisibility(s.panels || DEFAULT_SETTINGS.panels);
+});
